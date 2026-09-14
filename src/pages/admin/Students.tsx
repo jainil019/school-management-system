@@ -1,6 +1,14 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Search, Plus, Pencil, Trash2, Eye, X } from "lucide-react";
+import {
+  Search,
+  Plus,
+  Pencil,
+  Trash2,
+  Eye,
+  X,
+} from "lucide-react";
+
 import {
   getStudents,
   createStudent,
@@ -11,7 +19,6 @@ import {
 
 export default function Students() {
   const [students, setStudents] = useState<Student[]>([]);
-
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
@@ -19,8 +26,10 @@ export default function Students() {
   const [classFilter, setClassFilter] = useState("All");
 
   const [showModal, setShowModal] = useState(false);
-  const [editingStudent, setEditingStudent] = useState<Student | null>(null);
-  const [viewingStudent, setViewingStudent] = useState<Student | null>(null);
+  const [editingStudent, setEditingStudent] =
+    useState<Student | null>(null);
+  const [viewingStudent, setViewingStudent] =
+    useState<Student | null>(null);
 
   const [form, setForm] = useState({
     name: "",
@@ -32,7 +41,6 @@ export default function Students() {
     gender: "Male",
   });
 
-  // Load students from MongoDB
   const loadStudents = async () => {
     try {
       setLoading(true);
@@ -52,19 +60,20 @@ export default function Students() {
     loadStudents();
   }, []);
 
-  // Search + Filter
   const filteredStudents = students.filter((student) => {
+    const searchValue = search.toLowerCase();
+
     const matchesSearch =
-      student.name.toLowerCase().includes(search.toLowerCase()) ||
-      student.email.toLowerCase().includes(search.toLowerCase());
+      student.name.toLowerCase().includes(searchValue) ||
+      student.email.toLowerCase().includes(searchValue);
 
     const matchesClass =
-      classFilter === "All" || student.className === classFilter;
+      classFilter === "All" ||
+      student.className === classFilter;
 
     return matchesSearch && matchesClass;
   });
 
-  // Open Add Modal
   const openAddModal = () => {
     setEditingStudent(null);
 
@@ -81,7 +90,6 @@ export default function Students() {
     setShowModal(true);
   };
 
-  // Open Edit Modal
   const openEditModal = (student: Student) => {
     setEditingStudent(student);
 
@@ -98,7 +106,6 @@ export default function Students() {
     setShowModal(true);
   };
 
-  // Save Student
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -122,7 +129,6 @@ export default function Students() {
       };
 
       if (editingStudent?.id) {
-        // Update MongoDB
         const updatedStudent = await updateStudent(
           editingStudent.id,
           studentData
@@ -130,13 +136,14 @@ export default function Students() {
 
         setStudents((prev) =>
           prev.map((student) =>
-            student.id === editingStudent.id ? updatedStudent : student
+            student.id === editingStudent.id
+              ? updatedStudent
+              : student
           )
         );
 
         alert("Student updated successfully!");
       } else {
-        // Create in MongoDB
         const newStudent = await createStudent(studentData);
 
         setStudents((prev) => [...prev, newStudent]);
@@ -153,7 +160,6 @@ export default function Students() {
     }
   };
 
-  // Delete Student
   const deleteStudent = async (id: string) => {
     const confirmDelete = confirm(
       "Are you sure you want to delete this student?"
@@ -164,7 +170,9 @@ export default function Students() {
     try {
       await deleteStudentApi(id);
 
-      setStudents((prev) => prev.filter((student) => student.id !== id));
+      setStudents((prev) =>
+        prev.filter((student) => student.id !== id)
+      );
 
       alert("Student deleted successfully!");
     } catch (error) {
@@ -174,20 +182,22 @@ export default function Students() {
   };
 
   return (
-    <div>
+    <div className="w-full min-w-0">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
-        <div>
-          <h1 className="text-3xl font-bold text-slate-900">Students</h1>
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-5 sm:mb-6">
+        <div className="min-w-0">
+          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">
+            Students
+          </h1>
 
-          <p className="text-slate-500 mt-1">
+          <p className="text-sm sm:text-base text-slate-500 mt-1">
             Manage all students in the school
           </p>
         </div>
 
         <button
           onClick={openAddModal}
-          className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-3 rounded-xl font-medium"
+          className="w-full sm:w-auto flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-3 rounded-xl font-medium transition"
         >
           <Plus size={20} />
           Add Student
@@ -195,12 +205,12 @@ export default function Students() {
       </div>
 
       {/* Filters */}
-      <div className="bg-white p-4 rounded-2xl border border-slate-100 mb-6">
-        <div className="flex flex-col md:flex-row gap-4">
+      <div className="bg-white p-3 sm:p-4 rounded-2xl border border-slate-100 mb-4 sm:mb-6">
+        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
           {/* Search */}
-          <div className="relative flex-1">
+          <div className="relative flex-1 min-w-0">
             <Search
-              size={20}
+              size={19}
               className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
             />
 
@@ -209,7 +219,7 @@ export default function Students() {
               placeholder="Search student..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full border border-slate-200 rounded-xl py-3 pl-11 pr-4 outline-none focus:border-blue-500"
+              className="w-full border border-slate-200 rounded-xl py-3 pl-10 pr-4 text-sm sm:text-base outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
             />
           </div>
 
@@ -217,7 +227,7 @@ export default function Students() {
           <select
             value={classFilter}
             onChange={(e) => setClassFilter(e.target.value)}
-            className="border border-slate-200 rounded-xl px-4 py-3 outline-none focus:border-blue-500"
+            className="w-full sm:w-auto border border-slate-200 rounded-xl px-4 py-3 text-sm sm:text-base outline-none focus:border-blue-500 bg-white"
           >
             <option value="All">All Classes</option>
             <option value="10">Class 10</option>
@@ -227,33 +237,33 @@ export default function Students() {
         </div>
       </div>
 
-      {/* Table */}
+      {/* Student Table */}
       <div className="bg-white rounded-2xl border border-slate-100 overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[900px]">
+          <table className="w-full min-w-[850px]">
             <thead className="bg-slate-50 border-b border-slate-100">
               <tr>
-                <th className="text-left px-6 py-4 text-sm font-semibold text-slate-600">
+                <th className="text-left px-4 sm:px-6 py-4 text-sm font-semibold text-slate-600">
                   Student
                 </th>
 
-                <th className="text-left px-6 py-4 text-sm font-semibold text-slate-600">
+                <th className="text-left px-4 sm:px-6 py-4 text-sm font-semibold text-slate-600">
                   Class
                 </th>
 
-                <th className="text-left px-6 py-4 text-sm font-semibold text-slate-600">
+                <th className="text-left px-4 sm:px-6 py-4 text-sm font-semibold text-slate-600">
                   Roll No
                 </th>
 
-                <th className="text-left px-6 py-4 text-sm font-semibold text-slate-600">
+                <th className="text-left px-4 sm:px-6 py-4 text-sm font-semibold text-slate-600">
                   Phone
                 </th>
 
-                <th className="text-left px-6 py-4 text-sm font-semibold text-slate-600">
+                <th className="text-left px-4 sm:px-6 py-4 text-sm font-semibold text-slate-600">
                   Status
                 </th>
 
-                <th className="text-right px-6 py-4 text-sm font-semibold text-slate-600">
+                <th className="text-right px-4 sm:px-6 py-4 text-sm font-semibold text-slate-600">
                   Actions
                 </th>
               </tr>
@@ -269,45 +279,50 @@ export default function Students() {
                     Loading students...
                   </td>
                 </tr>
-              ) : (
+              ) : filteredStudents.length > 0 ? (
                 filteredStudents.map((student) => (
                   <tr
                     key={student.id}
-                    className="border-b border-slate-100 hover:bg-slate-50"
+                    className="border-b border-slate-100 hover:bg-slate-50 transition"
                   >
-                    <td className="px-6 py-4">
+                    {/* Student */}
+                    <td className="px-4 sm:px-6 py-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-semibold">
+                        <div className="w-9 h-9 sm:w-10 sm:h-10 shrink-0 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-semibold">
                           {student.name.charAt(0)}
                         </div>
 
-                        <div>
-                          <p className="font-medium text-slate-800">
+                        <div className="min-w-0">
+                          <p className="font-medium text-sm sm:text-base text-slate-800 truncate max-w-[220px]">
                             {student.name}
                           </p>
 
-                          <p className="text-xs text-slate-400">
+                          <p className="text-xs text-slate-400 truncate max-w-[220px]">
                             {student.email}
                           </p>
                         </div>
                       </div>
                     </td>
 
-                    <td className="px-6 py-4 text-slate-600">
+                    {/* Class */}
+                    <td className="px-4 sm:px-6 py-4 text-sm text-slate-600">
                       {student.className}-{student.division}
                     </td>
 
-                    <td className="px-6 py-4 text-slate-600">
+                    {/* Roll */}
+                    <td className="px-4 sm:px-6 py-4 text-sm text-slate-600">
                       {student.rollNo}
                     </td>
 
-                    <td className="px-6 py-4 text-slate-600">
+                    {/* Phone */}
+                    <td className="px-4 sm:px-6 py-4 text-sm text-slate-600">
                       {student.phone}
                     </td>
 
-                    <td className="px-6 py-4">
+                    {/* Status */}
+                    <td className="px-4 sm:px-6 py-4">
                       <span
-                        className={`px-3 py-1 rounded-full text-xs font-medium ${
+                        className={`inline-flex px-3 py-1 rounded-full text-xs font-medium ${
                           student.status === "Active"
                             ? "bg-green-50 text-green-600"
                             : "bg-red-50 text-red-600"
@@ -317,27 +332,32 @@ export default function Students() {
                       </span>
                     </td>
 
-                    <td className="px-6 py-4">
-                      <div className="flex justify-end gap-2">
+                    {/* Actions */}
+                    <td className="px-4 sm:px-6 py-4">
+                      <div className="flex justify-end gap-1.5 sm:gap-2">
                         <Link
                           to={`/admin/students/${student.id}`}
-                          className="p-2 rounded-lg hover:bg-blue-50 text-blue-600"
+                          className="p-2 rounded-lg hover:bg-blue-50 text-blue-600 transition"
+                          title="View"
                         >
                           <Eye size={18} />
                         </Link>
 
                         <button
                           onClick={() => openEditModal(student)}
-                          className="p-2 rounded-lg hover:bg-yellow-50 text-yellow-600"
+                          className="p-2 rounded-lg hover:bg-yellow-50 text-yellow-600 transition"
+                          title="Edit"
                         >
                           <Pencil size={18} />
                         </button>
 
                         <button
                           onClick={() =>
-                            student.id && deleteStudent(student.id)
+                            student.id &&
+                            deleteStudent(student.id)
                           }
-                          className="p-2 rounded-lg hover:bg-red-50 text-red-600"
+                          className="p-2 rounded-lg hover:bg-red-50 text-red-600 transition"
+                          title="Delete"
                         >
                           <Trash2 size={18} />
                         </button>
@@ -345,38 +365,53 @@ export default function Students() {
                     </td>
                   </tr>
                 ))
+              ) : (
+                <tr>
+                  <td
+                    colSpan={6}
+                    className="py-16 text-center text-slate-400"
+                  >
+                    No students found.
+                  </td>
+                </tr>
               )}
             </tbody>
           </table>
-
-          {!loading && filteredStudents.length === 0 && (
-            <div className="py-16 text-center text-slate-400">
-              No students found.
-            </div>
-          )}
         </div>
+
+        {/* Mobile scroll hint */}
+        {!loading && filteredStudents.length > 0 && (
+          <div className="sm:hidden px-4 py-2 text-[11px] text-slate-400 border-t bg-slate-50">
+            Swipe left/right to see all student details →
+          </div>
+        )}
       </div>
 
       {/* Add/Edit Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50">
-          <div className="bg-white w-full max-w-2xl rounded-2xl shadow-xl">
-            <div className="flex items-center justify-between p-6 border-b">
-              <h2 className="text-xl font-bold">
-                {editingStudent ? "Edit Student" : "Add Student"}
+        <div className="fixed inset-0 z-50 bg-black/50 flex items-end sm:items-center justify-center">
+          <div className="bg-white w-full sm:max-w-2xl sm:rounded-2xl rounded-t-3xl shadow-xl max-h-[92vh] overflow-y-auto">
+            {/* Modal Header */}
+            <div className="sticky top-0 z-10 flex items-center justify-between p-4 sm:p-6 border-b bg-white">
+              <h2 className="text-lg sm:text-xl font-bold">
+                {editingStudent
+                  ? "Edit Student"
+                  : "Add Student"}
               </h2>
 
               <button
                 onClick={() => setShowModal(false)}
-                className="p-2 hover:bg-slate-100 rounded-lg"
+                className="p-2 hover:bg-slate-100 rounded-lg transition"
+                aria-label="Close"
               >
-                <X />
+                <X size={21} />
               </button>
             </div>
 
+            {/* Form */}
             <form
               onSubmit={handleSubmit}
-              className="p-6 grid grid-cols-1 md:grid-cols-2 gap-4"
+              className="p-4 sm:p-6 grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4"
             >
               <input
                 placeholder="Student Name *"
@@ -387,7 +422,7 @@ export default function Students() {
                     name: e.target.value,
                   })
                 }
-                className="border rounded-xl px-4 py-3"
+                className="w-full border border-slate-200 rounded-xl px-4 py-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
               />
 
               <input
@@ -400,7 +435,7 @@ export default function Students() {
                     email: e.target.value,
                   })
                 }
-                className="border rounded-xl px-4 py-3"
+                className="w-full border border-slate-200 rounded-xl px-4 py-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
               />
 
               <input
@@ -412,7 +447,7 @@ export default function Students() {
                     phone: e.target.value,
                   })
                 }
-                className="border rounded-xl px-4 py-3"
+                className="w-full border border-slate-200 rounded-xl px-4 py-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
               />
 
               <select
@@ -423,7 +458,7 @@ export default function Students() {
                     className: e.target.value,
                   })
                 }
-                className="border rounded-xl px-4 py-3"
+                className="w-full border border-slate-200 rounded-xl px-4 py-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 bg-white"
               >
                 <option value="">Select Class *</option>
                 <option value="10">Class 10</option>
@@ -440,7 +475,7 @@ export default function Students() {
                     division: e.target.value,
                   })
                 }
-                className="border rounded-xl px-4 py-3"
+                className="w-full border border-slate-200 rounded-xl px-4 py-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
               />
 
               <input
@@ -453,7 +488,7 @@ export default function Students() {
                     rollNo: e.target.value,
                   })
                 }
-                className="border rounded-xl px-4 py-3"
+                className="w-full border border-slate-200 rounded-xl px-4 py-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
               />
 
               <select
@@ -464,18 +499,19 @@ export default function Students() {
                     gender: e.target.value,
                   })
                 }
-                className="border rounded-xl px-4 py-3"
+                className="w-full border border-slate-200 rounded-xl px-4 py-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 bg-white"
               >
                 <option value="Male">Male</option>
                 <option value="Female">Female</option>
                 <option value="Other">Other</option>
               </select>
 
-              <div className="md:col-span-2 flex justify-end gap-3 mt-4">
+              {/* Buttons */}
+              <div className="md:col-span-2 flex flex-col-reverse sm:flex-row justify-end gap-2 sm:gap-3 pt-3 sm:pt-4 border-t sm:border-0">
                 <button
                   type="button"
                   onClick={() => setShowModal(false)}
-                  className="px-5 py-3 rounded-xl border"
+                  className="w-full sm:w-auto px-5 py-3 rounded-xl border border-slate-200 hover:bg-slate-50 transition"
                 >
                   Cancel
                 </button>
@@ -483,7 +519,7 @@ export default function Students() {
                 <button
                   type="submit"
                   disabled={saving}
-                  className="px-5 py-3 rounded-xl bg-blue-600 text-white disabled:opacity-50"
+                  className="w-full sm:w-auto px-5 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-50 transition"
                 >
                   {saving
                     ? "Saving..."
@@ -497,53 +533,60 @@ export default function Students() {
         </div>
       )}
 
-      {/* View Student */}
+      {/* View Student Modal */}
       {viewingStudent && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50">
-          <div className="bg-white w-full max-w-md rounded-2xl shadow-xl p-6">
-            <div className="flex justify-between items-start">
-              <div>
-                <div className="w-16 h-16 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-2xl font-bold">
+        <div className="fixed inset-0 z-50 bg-black/50 flex items-end sm:items-center justify-center p-0 sm:p-4">
+          <div className="bg-white w-full sm:max-w-md rounded-t-3xl sm:rounded-2xl shadow-xl p-5 sm:p-6 max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-start gap-4">
+              <div className="min-w-0">
+                <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xl sm:text-2xl font-bold">
                   {viewingStudent.name.charAt(0)}
                 </div>
 
-                <h2 className="text-2xl font-bold mt-4">
+                <h2 className="text-xl sm:text-2xl font-bold mt-4 break-words">
                   {viewingStudent.name}
                 </h2>
               </div>
 
               <button
                 onClick={() => setViewingStudent(null)}
-                className="p-2 hover:bg-slate-100 rounded-lg"
+                className="p-2 hover:bg-slate-100 rounded-lg shrink-0"
+                aria-label="Close"
               >
-                <X />
+                <X size={21} />
               </button>
             </div>
 
-            <div className="mt-6 space-y-3 text-sm">
+            <div className="mt-6 space-y-3 text-sm break-words">
               <p>
-                <strong>Email:</strong> {viewingStudent.email}
+                <strong>Email:</strong>{" "}
+                {viewingStudent.email}
               </p>
 
               <p>
-                <strong>Phone:</strong> {viewingStudent.phone}
+                <strong>Phone:</strong>{" "}
+                {viewingStudent.phone}
               </p>
 
               <p>
-                <strong>Class:</strong> {viewingStudent.className}-
+                <strong>Class:</strong>{" "}
+                {viewingStudent.className}-
                 {viewingStudent.division}
               </p>
 
               <p>
-                <strong>Roll No:</strong> {viewingStudent.rollNo}
+                <strong>Roll No:</strong>{" "}
+                {viewingStudent.rollNo}
               </p>
 
               <p>
-                <strong>Gender:</strong> {viewingStudent.gender}
+                <strong>Gender:</strong>{" "}
+                {viewingStudent.gender}
               </p>
 
               <p>
-                <strong>Status:</strong> {viewingStudent.status}
+                <strong>Status:</strong>{" "}
+                {viewingStudent.status}
               </p>
             </div>
           </div>
